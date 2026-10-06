@@ -1,4 +1,4 @@
-const BASE = 'https://volby.gov.cz/appdata/kv2026/20261009/odata/okrsky';
+const BASE = 'https://volby.gov.cz/appdata/kv2026/20261009/odata';
 
 export default async function handler(req, res) {
   const raw = String(req.query?.n || 'latest').toLowerCase();
