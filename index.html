@@ -5,21 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Volby 2026 · Praha 8</title>
   <meta name="description" content="Průběžné výsledky komunálních voleb 2026 v MČ Praha 8 po volebních okrscích." />
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3yn0pHGeYx0fLJsoZ4Gy4P/3ZKzJs=" crossorigin="" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <div class="eyebrow"><span id="phase-pill">PŘED VOLBAMI</span><span>Zastupitelstvo MČ · 45 mandátů</span></div>
+        <div class="eyebrow">
+          <span id="phase-pill">PŘED VOLBAMI</span>
+          <span>Zastupitelstvo MČ Praha 8 · 45 mandátů</span>
+        </div>
         <h1>Volby 2026 <span>•</span> Praha 8</h1>
         <div class="subline" id="header-status">Volební místnosti se uzavírají v sobotu 10. 10. ve 14:00.</div>
       </div>
       <div class="topbar-actions">
-        <button class="refresh" id="refresh-btn" type="button" aria-label="Obnovit data">↻ <span id="refresh-label">70 s</span></button>
-        <button class="menu" type="button" aria-label="Menu">☰</button>
+        <button class="refresh" id="refresh-btn" type="button" aria-label="Obnovit data">↻ <span id="refresh-label">60 s</span></button>
         <div class="checked" id="checked-at">kontrola —</div>
       </div>
     </header>
@@ -33,65 +35,119 @@
           <button class="tab" data-tab="precincts">Okrsky</button>
         </nav>
 
-        <section class="card countdown-card" id="countdown-card">
-          <div class="card-kicker">VÝSLEDKY ZAČNOU CHODIT PO 14:00</div>
-          <div class="countdown" id="countdown">—</div>
-          <p>Volební místnosti se zavírají v sobotu 10. 10. ve 14:00. Potom se stránka sama obnovuje a postupně ukáže sečtené okrsky, mandáty i mapu výsledků.</p>
-          <button class="primary-button" id="demo-btn" type="button">▶ Vyzkoušet demo sčítání</button>
-        </section>
+        <div class="tab-panel active" data-panel="overview">
+          <section class="card countdown-card" id="countdown-card">
+            <div class="card-kicker">DO UZAVŘENÍ VOLEBNÍCH MÍSTNOSTÍ</div>
+            <div class="countdown" id="countdown">—</div>
+            <p id="countdown-note">Do začátku sčítání zobrazuje mapa pro orientaci výsledky komunálních voleb 2022.</p>
+          </section>
 
-        <section class="card party-focus" id="party-focus">
-          <div class="party-focus-head">
-            <div>
-              <div class="card-kicker accent" id="selected-name">ČESKÁ PIRÁTSKÁ STRANA</div>
-              <div class="big-result"><span id="selected-pct">—</span><span class="percent-sign">%</span></div>
-              <div class="muted" id="selected-note">Čeká na první sečtené okrsky</div>
+          <section class="card status-card">
+            <div class="stats-grid">
+              <div><span>Sečteno</span><strong id="counted-stat">0 / 106</strong></div>
+              <div><span>Účast</span><strong id="turnout-stat">—</strong></div>
+              <div><span>Mandáty</span><strong id="seats-stat">0 / 45</strong></div>
             </div>
-            <div class="seats-box"><strong id="selected-seats">6</strong><span>mandátů<br>v 2022</span></div>
-          </div>
-        </section>
+          </section>
 
-        <section class="card coalition-card">
-          <div class="section-title-row">
-            <div class="card-kicker">SOUČASNÁ KOALICE</div>
-            <span class="muted">stav po volbách 2022</span>
-          </div>
-          <div class="coalition-number"><strong>27</strong><span>/ 45 mandátů</span></div>
-          <div class="seat-strip" id="coalition-strip" aria-label="27 z 45 mandátů"></div>
-          <div class="chips">
-            <span class="chip">ODS</span><span class="chip">ANO</span><span class="chip">TOP 09 + STAN</span><span class="chip">Patrioti</span>
-          </div>
-        </section>
+          <section class="card party-focus" id="party-focus">
+            <div class="party-focus-head">
+              <div>
+                <div class="card-kicker accent" id="selected-name">ČESKÁ PIRÁTSKÁ STRANA</div>
+                <div class="big-result"><span id="selected-pct">—</span><span class="percent-sign">%</span></div>
+                <div class="muted" id="selected-note">Výsledek 2022</div>
+              </div>
+              <div class="seats-box">
+                <strong id="selected-seats">6</strong>
+                <span id="selected-seats-note">mandátů<br>v 2022</span>
+              </div>
+            </div>
+          </section>
 
-        <section class="card party-list-card">
-          <div class="section-title-row">
-            <div class="card-kicker">STRANY</div>
-            <span class="muted" id="party-list-note">v závorkách KV 2022</span>
-          </div>
-          <div id="party-list" class="party-list"></div>
-        </section>
+          <section class="card party-list-card">
+            <div class="section-title-row">
+              <div class="card-kicker">STRANY</div>
+              <span class="muted" id="party-list-note">výsledky 2022</span>
+            </div>
+            <div id="party-list" class="party-list"></div>
+          </section>
+        </div>
+
+        <div class="tab-panel" data-panel="councillors">
+          <section class="card section-card">
+            <div class="section-title-row">
+              <div>
+                <div class="card-kicker">ZVOLENÍ ZASTUPITELÉ</div>
+                <h2 id="councillors-title">Zastupitelstvo 2022</h2>
+              </div>
+              <span class="badge" id="councillors-count">45</span>
+            </div>
+            <p class="section-help" id="councillors-help">Do přidělení mandátů v roce 2026 zobrazujeme zastupitele zvolených v roce 2022.</p>
+            <div class="filter-row" id="councillor-filters"></div>
+            <div id="councillors-list" class="councillors-list">
+              <div class="loading-state">Načítám zastupitele…</div>
+            </div>
+          </section>
+        </div>
+
+        <div class="tab-panel" data-panel="coalition">
+          <section class="card section-card">
+            <div class="card-kicker">KALKULAČKA KOALICE</div>
+            <h2>Většina je 23 mandátů</h2>
+            <p class="section-help" id="coalition-help">Před sečtením pracujeme s mandáty z voleb 2022. Po přidělení mandátů se kalkulačka automaticky přepne na rok 2026.</p>
+            <div class="coalition-meter">
+              <strong id="coalition-total">0</strong><span>/ 45</span>
+              <div class="coalition-majority" id="coalition-majority">Vyberte strany</div>
+            </div>
+            <div class="seat-strip" id="coalition-strip" aria-label="Mandáty vybrané koalice"></div>
+            <div id="coalition-list" class="coalition-list"></div>
+          </section>
+        </div>
+
+        <div class="tab-panel" data-panel="precincts">
+          <section class="card section-card precincts-card">
+            <div class="section-title-row">
+              <div>
+                <div class="card-kicker">VOLEBNÍ OKRSKY</div>
+                <h2>Praha 8</h2>
+              </div>
+              <span class="badge">106</span>
+            </div>
+            <p class="section-help">Kliknutím na okrsek ho přiblížíte v mapě. Po začátku sčítání se jednotlivé řádky automaticky přepínají na data 2026.</p>
+            <div class="search-wrap">
+              <input id="precinct-search" type="search" inputmode="numeric" placeholder="Najít okrsek, např. 8054" autocomplete="off" />
+            </div>
+            <div id="precinct-list" class="precinct-list">
+              <div class="loading-state">Načítám okrsky…</div>
+            </div>
+          </section>
+        </div>
       </aside>
 
       <section class="map-panel">
-        <div id="map" role="application" aria-label="Mapa volebních okrsků Prahy 8"></div>
+        <div id="map" role="application" aria-label="Mapa volebních okrsků Prahy 8">
+          <div class="map-loading" id="map-loading">Načítám mapu Prahy 8…</div>
+        </div>
+
         <div class="legend-card">
-          <div class="legend-tabs">
-            <button class="legend-tab active">Strana</button>
-            <button class="legend-tab" disabled>Vítěz</button>
-            <button class="legend-tab" disabled>Účast</button>
+          <div class="legend-tabs" role="tablist" aria-label="Zobrazení mapy">
+            <button class="legend-tab active" data-map-mode="party" type="button">Strana</button>
+            <button class="legend-tab" data-map-mode="winner" type="button">Vítěz</button>
+            <button class="legend-tab" data-map-mode="turnout" type="button">Účast</button>
           </div>
           <div class="legend-title" id="legend-title">PIRÁTI — PODÍL HLASŮ</div>
           <div class="legend-grid" id="legend-grid"></div>
         </div>
-        <div class="map-status" id="map-status">Ještě se nesčítá — mapa zatím čeká na výsledky komunálních voleb 2026.</div>
-        <div class="demo-ribbon" id="demo-ribbon" hidden>DEMO DATA — nejde o skutečné výsledky</div>
+
+        <div class="map-status" id="map-status">Načítám hranice volebních okrsků…</div>
+        <div class="year-ribbon" id="year-ribbon">MAPA: VOLBY 2022</div>
       </section>
     </main>
   </div>
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'"></script>
   <script src="./app.js" type="module"></script>
 </body>
 </html>
