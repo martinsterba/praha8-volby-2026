@@ -5,23 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Volby 2026 · Praha 8</title>
   <meta name="description" content="Průběžné výsledky komunálních voleb 2026 v MČ Praha 8 po volebních okrscích." />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="./styles.css" />
+  <style>
+:root{--ink:#17121e;--muted:#77717c;--line:#e7e3e9;--panel:#f3f2ef;--paper:#fff;--header:#180b2a;--header2:#25123f;--accent:#f0db55;--radius:16px}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#efefed}button,input{font:inherit}.app-shell{min-height:100vh}
+.topbar{min-height:94px;background:linear-gradient(90deg,var(--header),var(--header2));color:#fff;display:flex;justify-content:space-between;align-items:flex-start;padding:15px 20px 13px;gap:24px}.eyebrow{display:flex;align-items:center;gap:10px;font-size:12px;color:#bdb2c9}.eyebrow span:first-child{color:#fff;font-weight:900;background:#ffffff1f;padding:4px 8px;border-radius:999px}h1{margin:7px 0 3px;font-size:clamp(24px,2vw,31px);letter-spacing:-.035em;line-height:1}h1 span{color:var(--accent)}h2{margin:5px 0 0;font-size:22px;line-height:1.1;letter-spacing:-.025em}.subline{font-size:12px;color:#c8bfce}.topbar-actions{display:grid;justify-items:end;gap:5px}.refresh{border:0;background:transparent;color:#fff;cursor:pointer;font-weight:800;padding:8px 10px;border-radius:8px}.refresh:hover{background:#ffffff16}.checked{color:#93879d;font-size:11px}
+.workspace{display:grid;grid-template-columns:minmax(380px,500px) minmax(0,1fr);height:calc(100vh - 94px);min-height:650px}.sidebar{overflow-y:auto;background:var(--panel);border-right:1px solid #ddd9df;padding:0 12px 18px}.tabs{position:sticky;top:0;z-index:40;background:var(--panel);padding:12px 0 10px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.tab{border:0;padding:10px 7px;background:transparent;border-radius:10px;color:#5d5762;font-weight:800;cursor:pointer;font-size:13px}.tab:hover{background:#e9e6e9}.tab.active{color:#fff;background:var(--header2)}.tab-panel{display:none}.tab-panel.active{display:block}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 2px 8px #140a2306;margin-bottom:12px;overflow:hidden}.countdown-card{padding:18px;background:linear-gradient(135deg,#fffef8,#fffceb);border-color:#eee9c8}.card-kicker{letter-spacing:.06em;font-size:11px;font-weight:900;color:#6d6671}.card-kicker.accent{color:#f2d84e}.countdown{margin:8px 0;font-size:27px;font-weight:900;letter-spacing:-.035em}.countdown-card p,.section-help{margin:0;line-height:1.45;color:#5a545e;font-size:12px}.status-card{padding:13px 16px}.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stats-grid span{display:block;color:#918a95;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.stats-grid strong{display:block;margin-top:4px;font-size:18px;letter-spacing:-.02em;white-space:nowrap}
+.party-focus{background:linear-gradient(135deg,#160925,#24113f);color:#fff;border:none}.party-focus-head{display:flex;justify-content:space-between;gap:12px;padding:16px 18px 15px}.big-result{margin-top:5px;font-size:48px;font-weight:900;letter-spacing:-.055em;line-height:1}.percent-sign{font-size:.78em}.muted{color:#918b94;font-size:11px}.party-focus .muted{color:#b9b0c3}.seats-box{text-align:center;min-width:74px;align-self:center}.seats-box strong{display:block;color:var(--accent);font-size:34px;line-height:.9}.seats-box span{display:block;margin-top:6px;color:#bbb1c6;font-size:10px;line-height:1.2}
+.party-list-card,.section-card{padding:16px 18px}.section-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.badge{display:inline-flex;min-width:34px;height:34px;padding:0 9px;align-items:center;justify-content:center;border-radius:999px;background:#f0edf2;color:#554d5d;font-weight:900;font-size:12px}.party-list{margin-top:10px;display:flex;flex-direction:column;gap:5px}.party-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:9px 9px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent}.party-row:hover{background:#f8f7f8}.party-row.active{background:#fff9cf;border-color:#f2e89d}.party-label{display:flex;gap:8px;align-items:center;min-width:0;font-size:13px;font-weight:800}.party-label span:last-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.party-dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}.party-score{font-size:12px;color:#77717b;white-space:nowrap;font-variant-numeric:tabular-nums}.party-track{grid-column:1/-1;height:4px;border-radius:999px;background:#f0edef;overflow:hidden}.party-track>span{display:block;height:100%}
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding:12px 0 10px;scrollbar-width:none}.filter-row::-webkit-scrollbar{display:none}.filter-chip{border:1px solid #ddd7e0;background:#fff;color:#5d5662;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:800;white-space:nowrap;cursor:pointer}.filter-chip.active{background:#27143f;color:#fff;border-color:#27143f}.councillors-list{display:flex;flex-direction:column;gap:7px}.councillor-row{display:grid;grid-template-columns:10px 1fr auto;gap:9px;align-items:start;padding:10px 8px;border:1px solid #eeeaf0;border-radius:11px}.councillor-color{width:8px;height:100%;min-height:42px;border-radius:5px}.councillor-name{font-size:13px;font-weight:900;line-height:1.2}.councillor-meta{margin-top:3px;color:#817a85;font-size:10px;line-height:1.35}.councillor-votes{text-align:right;color:#756d78;font-size:10px}.loading-state,.empty-state{padding:18px 10px;color:#807984;font-size:12px;text-align:center}
+.coalition-meter{margin:16px 0 8px;display:flex;align-items:baseline;gap:6px}.coalition-meter strong{font-size:42px;line-height:1}.coalition-meter span{color:#817a84;font-size:13px}.coalition-majority{margin-left:auto;font-size:11px;font-weight:900;color:#8a838e}.coalition-majority.ok{color:#25784a}.seat-strip{display:grid;grid-template-columns:repeat(45,1fr);gap:2px;margin:9px 0 16px}.seat{height:14px;background:#ebe8ec;border-radius:2px}.seat.filled{background:#6e6178}.coalition-list{display:flex;flex-direction:column;gap:5px}.coalition-option{display:grid;grid-template-columns:auto 10px 1fr auto;gap:8px;align-items:center;border:1px solid #ece8ee;border-radius:10px;padding:9px;cursor:pointer}.coalition-option:hover{background:#faf9fa}.coalition-option input{width:16px;height:16px;margin:0;accent-color:#281541}.coalition-option strong{font-size:12px}.coalition-option span:last-child{font-size:11px;color:#746d77;font-weight:800}
+.search-wrap{margin:13px 0 10px}.search-wrap input{width:100%;border:1px solid #ddd8df;background:#fbfafb;border-radius:10px;padding:10px 11px;outline:none;font-size:12px}.search-wrap input:focus{border-color:#8b7a9a;box-shadow:0 0 0 3px #4e2b7d14}.precinct-list{display:flex;flex-direction:column;gap:5px;max-height:calc(100vh - 310px);overflow-y:auto}.precinct-row{display:grid;grid-template-columns:62px 1fr auto;gap:9px;align-items:center;padding:9px 8px;border:1px solid #ece8ee;border-radius:10px;background:#fff;cursor:pointer}.precinct-row:hover,.precinct-row.active{background:#fff9cf;border-color:#eee19c}.precinct-no{font-size:13px;font-weight:900}.precinct-main{min-width:0}.precinct-main strong{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px}.precinct-main span{display:block;margin-top:2px;color:#88818c;font-size:10px}.precinct-source{font-size:9px;font-weight:900;border-radius:999px;padding:4px 6px;background:#efecf1;color:#6c6472}.precinct-source.live{background:#dff5e8;color:#26724a}
+.map-panel{position:relative;min-height:0;overflow:hidden;background:linear-gradient(135deg,#e7e6e2,#f1f0ed)}.map-canvas{position:absolute;inset:0;overflow:hidden}.map-canvas svg{position:absolute;inset:0;width:100%;height:100%;display:block}.map-loading{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;color:#6e6870;font-weight:800;background:#e8e7e3}.precinct-shape{stroke:#fff;stroke-width:1.15;vector-effect:non-scaling-stroke;cursor:pointer;transition:fill .2s ease,opacity .2s ease,stroke-width .1s ease}.precinct-shape:hover,.precinct-shape.selected{stroke:#1c1029;stroke-width:2.6}.map-tooltip{position:absolute;z-index:30;pointer-events:none;min-width:180px;max-width:250px;background:#fff;color:#24182e;border:1px solid #ddd7e1;border-radius:10px;box-shadow:0 10px 28px #1e14262b;padding:9px 10px;font-size:11px}.map-tooltip strong{display:block;font-size:13px;margin-bottom:4px}.map-tooltip .tooltip-value{font-size:18px;font-weight:900;margin-top:3px}.map-tooltip .tooltip-sub{color:#817a85;font-size:9px;margin-top:2px}
+.map-toolbar{position:absolute;z-index:20;top:18px;right:18px;display:flex;gap:5px;background:#ffffffed;border:1px solid #e4e0e4;border-radius:12px;padding:5px;box-shadow:0 8px 28px #23192d1f}.map-mode{border:0;padding:8px 11px;background:transparent;font-weight:900;border-radius:8px;color:#4b4650;cursor:pointer}.map-mode.active{background:var(--header2);color:#fff}.legend-card{position:absolute;z-index:20;top:76px;right:18px;width:min(295px,calc(100% - 36px));background:#ffffffed;border:1px solid #e4e0e4;border-radius:14px;box-shadow:0 8px 28px #23192d21;padding:11px 12px}.legend-title{font-size:11px;letter-spacing:.05em;font-weight:900;color:#665f69;margin-bottom:8px}.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}.legend-item{display:flex;align-items:center;gap:6px;font-size:10px;color:#5e5962}.legend-swatch{width:12px;height:12px;border-radius:3px;border:1px solid #00000012;flex:0 0 12px}.map-status{position:absolute;z-index:20;bottom:16px;left:16px;max-width:700px;background:#1b0e2bef;color:#fff;border-radius:10px;padding:9px 12px;font-size:11px;box-shadow:0 5px 18px #00000024}.map-status strong{color:var(--accent)}.year-ribbon{position:absolute;z-index:21;left:50%;transform:translateX(-50%);top:18px;background:var(--accent);color:#20172a;padding:8px 12px;border-radius:999px;font-size:10px;font-weight:900;box-shadow:0 5px 18px #00000020;white-space:nowrap}.map-reset{position:absolute;z-index:21;left:16px;top:18px;border:1px solid #dcd7df;background:#fff;color:#342940;border-radius:9px;padding:8px 10px;font-size:10px;font-weight:900;cursor:pointer;box-shadow:0 5px 16px #00000012}.toast{position:fixed;z-index:1000;left:50%;bottom:22px;transform:translateX(-50%);background:#19111f;color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;box-shadow:0 10px 30px #0003}
+@media(max-width:930px){.workspace{grid-template-columns:1fr;height:auto;min-height:0}.sidebar{overflow:visible;order:2}.map-panel{order:1;height:58vh;min-height:460px}.topbar{min-height:105px}.precinct-list{max-height:520px}}@media(max-width:620px){.topbar{padding:13px 14px}.eyebrow span:last-child{display:none}.workspace{grid-template-columns:minmax(0,1fr)}.sidebar{padding:0 8px 12px}.map-panel{height:53vh;min-height:420px}.map-toolbar{top:10px;right:10px}.legend-card{top:64px;right:10px;width:225px}.legend-grid{grid-template-columns:1fr}.map-status{left:10px;right:10px;bottom:10px;max-width:none}.year-ribbon{top:10px;left:10px;transform:none}.map-reset{left:10px;top:52px}.party-focus-head{padding:14px}.stats-grid strong{font-size:16px}}
+
+</style>
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <div class="eyebrow">
-          <span id="phase-pill">PŘED VOLBAMI</span>
-          <span>Zastupitelstvo MČ Praha 8 · 45 mandátů</span>
-        </div>
+        <div class="eyebrow"><span id="phase-pill">PŘED VOLBAMI</span><span>Zastupitelstvo MČ Praha 8 · 45 mandátů</span></div>
         <h1>Volby 2026 <span>•</span> Praha 8</h1>
         <div class="subline" id="header-status">Volební místnosti se uzavírají v sobotu 10. 10. ve 14:00.</div>
       </div>
       <div class="topbar-actions">
-        <button class="refresh" id="refresh-btn" type="button" aria-label="Obnovit data">↻ <span id="refresh-label">60 s</span></button>
+        <button class="refresh" id="refresh-btn" type="button">↻ <span id="refresh-label">60 s</span></button>
         <div class="checked" id="checked-at">kontrola —</div>
       </div>
     </header>
@@ -35,119 +45,173 @@
           <button class="tab" data-tab="precincts">Okrsky</button>
         </nav>
 
-        <div class="tab-panel active" data-panel="overview">
-          <section class="card countdown-card" id="countdown-card">
+        <section class="tab-panel active" data-panel="overview">
+          <div class="card countdown-card" id="countdown-card">
             <div class="card-kicker">DO UZAVŘENÍ VOLEBNÍCH MÍSTNOSTÍ</div>
             <div class="countdown" id="countdown">—</div>
-            <p id="countdown-note">Do začátku sčítání zobrazuje mapa pro orientaci výsledky komunálních voleb 2022.</p>
-          </section>
+            <p id="countdown-note">Do začátku sčítání ukazuje mapa pro orientaci výsledky komunálních voleb 2022.</p>
+          </div>
 
-          <section class="card status-card">
+          <div class="card status-card">
             <div class="stats-grid">
               <div><span>Sečteno</span><strong id="counted-stat">0 / 106</strong></div>
               <div><span>Účast</span><strong id="turnout-stat">—</strong></div>
               <div><span>Mandáty</span><strong id="seats-stat">0 / 45</strong></div>
             </div>
-          </section>
+          </div>
 
-          <section class="card party-focus" id="party-focus">
+          <div class="card party-focus">
             <div class="party-focus-head">
               <div>
                 <div class="card-kicker accent" id="selected-name">ČESKÁ PIRÁTSKÁ STRANA</div>
                 <div class="big-result"><span id="selected-pct">—</span><span class="percent-sign">%</span></div>
-                <div class="muted" id="selected-note">Výsledek 2022</div>
+                <div class="muted" id="selected-note">Načítám data…</div>
               </div>
-              <div class="seats-box">
-                <strong id="selected-seats">6</strong>
-                <span id="selected-seats-note">mandátů<br>v 2022</span>
-              </div>
+              <div class="seats-box"><strong id="selected-seats">6</strong><span id="selected-seats-note">mandátů<br>v 2022</span></div>
             </div>
-          </section>
+          </div>
 
-          <section class="card party-list-card">
-            <div class="section-title-row">
-              <div class="card-kicker">STRANY</div>
-              <span class="muted" id="party-list-note">výsledky 2022</span>
-            </div>
-            <div id="party-list" class="party-list"></div>
-          </section>
-        </div>
+          <div class="card party-list-card">
+            <div class="section-title-row"><div class="card-kicker">STRANY</div><span class="muted" id="party-list-note">výsledky 2022</span></div>
+            <div id="party-list" class="party-list"><div class="loading-state">Načítám strany…</div></div>
+          </div>
+        </section>
 
-        <div class="tab-panel" data-panel="councillors">
-          <section class="card section-card">
+        <section class="tab-panel" data-panel="councillors">
+          <div class="card section-card">
             <div class="section-title-row">
-              <div>
-                <div class="card-kicker">ZVOLENÍ ZASTUPITELÉ</div>
-                <h2 id="councillors-title">Zastupitelstvo 2022</h2>
-              </div>
-              <span class="badge" id="councillors-count">45</span>
+              <div><div class="card-kicker">ZVOLENÍ ZASTUPITELÉ</div><h2 id="councillors-title">Zastupitelstvo</h2></div>
+              <span class="badge" id="councillors-count">—</span>
             </div>
-            <p class="section-help" id="councillors-help">Do přidělení mandátů v roce 2026 zobrazujeme zastupitele zvolených v roce 2022.</p>
+            <p class="section-help" id="councillors-help">Načítám zvolené zastupitele…</p>
             <div class="filter-row" id="councillor-filters"></div>
-            <div id="councillors-list" class="councillors-list">
-              <div class="loading-state">Načítám zastupitele…</div>
-            </div>
-          </section>
-        </div>
+            <div id="councillors-list" class="councillors-list"><div class="loading-state">Načítám zastupitele…</div></div>
+          </div>
+        </section>
 
-        <div class="tab-panel" data-panel="coalition">
-          <section class="card section-card">
+        <section class="tab-panel" data-panel="coalition">
+          <div class="card section-card">
             <div class="card-kicker">KALKULAČKA KOALICE</div>
             <h2>Většina je 23 mandátů</h2>
-            <p class="section-help" id="coalition-help">Před sečtením pracujeme s mandáty z voleb 2022. Po přidělení mandátů se kalkulačka automaticky přepne na rok 2026.</p>
-            <div class="coalition-meter">
-              <strong id="coalition-total">0</strong><span>/ 45</span>
-              <div class="coalition-majority" id="coalition-majority">Vyberte strany</div>
-            </div>
-            <div class="seat-strip" id="coalition-strip" aria-label="Mandáty vybrané koalice"></div>
+            <p class="section-help" id="coalition-help">Před přidělením mandátů 2026 používáme mandáty z voleb 2022.</p>
+            <div class="coalition-meter"><strong id="coalition-total">0</strong><span>/ 45</span><div class="coalition-majority" id="coalition-majority">Vyberte strany</div></div>
+            <div class="seat-strip" id="coalition-strip"></div>
             <div id="coalition-list" class="coalition-list"></div>
-          </section>
-        </div>
+          </div>
+        </section>
 
-        <div class="tab-panel" data-panel="precincts">
-          <section class="card section-card precincts-card">
+        <section class="tab-panel" data-panel="precincts">
+          <div class="card section-card precincts-card">
             <div class="section-title-row">
-              <div>
-                <div class="card-kicker">VOLEBNÍ OKRSKY</div>
-                <h2>Praha 8</h2>
-              </div>
+              <div><div class="card-kicker">VOLEBNÍ OKRSKY</div><h2>Praha 8</h2></div>
               <span class="badge">106</span>
             </div>
-            <p class="section-help">Kliknutím na okrsek ho přiblížíte v mapě. Po začátku sčítání se jednotlivé řádky automaticky přepínají na data 2026.</p>
-            <div class="search-wrap">
-              <input id="precinct-search" type="search" inputmode="numeric" placeholder="Najít okrsek, např. 8054" autocomplete="off" />
-            </div>
-            <div id="precinct-list" class="precinct-list">
-              <div class="loading-state">Načítám okrsky…</div>
-            </div>
-          </section>
-        </div>
+            <p class="section-help">Kliknutím na okrsek ho zvýrazníte v mapě. Po sečtení se řádek automaticky přepne na rok 2026.</p>
+            <div class="search-wrap"><input id="precinct-search" type="search" inputmode="numeric" placeholder="Najít okrsek, např. 8054" autocomplete="off" /></div>
+            <div id="precinct-list" class="precinct-list"><div class="loading-state">Načítám okrsky…</div></div>
+          </div>
+        </section>
       </aside>
 
       <section class="map-panel">
-        <div id="map" role="application" aria-label="Mapa volebních okrsků Prahy 8">
-          <div class="map-loading" id="map-loading">Načítám mapu Prahy 8…</div>
+        <div class="map-toolbar" aria-label="Zobrazení mapy">
+          <button class="map-mode active" data-map-mode="party" type="button">Strana</button>
+          <button class="map-mode" data-map-mode="winner" type="button">Vítěz</button>
+          <button class="map-mode" data-map-mode="turnout" type="button">Účast</button>
+        </div>
+
+        <div id="map" class="map-canvas" aria-label="Mapa volebních okrsků Prahy 8">
+          <div class="map-loading" id="map-loading">Načítám hranice okrsků…</div>
+          <svg id="map-svg" viewBox="0 0 1000 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+          <div class="map-tooltip" id="map-tooltip" hidden></div>
         </div>
 
         <div class="legend-card">
-          <div class="legend-tabs" role="tablist" aria-label="Zobrazení mapy">
-            <button class="legend-tab active" data-map-mode="party" type="button">Strana</button>
-            <button class="legend-tab" data-map-mode="winner" type="button">Vítěz</button>
-            <button class="legend-tab" data-map-mode="turnout" type="button">Účast</button>
-          </div>
           <div class="legend-title" id="legend-title">PIRÁTI — PODÍL HLASŮ</div>
           <div class="legend-grid" id="legend-grid"></div>
         </div>
 
-        <div class="map-status" id="map-status">Načítám hranice volebních okrsků…</div>
+        <button class="map-reset" id="map-reset" type="button" hidden>Celá Praha 8</button>
         <div class="year-ribbon" id="year-ribbon">MAPA: VOLBY 2022</div>
+        <div class="map-status" id="map-status">Načítám mapu…</div>
       </section>
     </main>
   </div>
-
   <div class="toast" id="toast" hidden></div>
+  <script type="module">
+const CLOSE = new Date('2026-10-10T14:00:00+02:00');
+const REFRESH = 60;
+const MIN = 8001, MAX = 8106;
+const parties = [
+  {id:1,name:'8žije, Praha sobě a Zelení',short:'8ŽIJE + PS + Zelení',color:'#36a35b',seats2022:9},
+  {id:2,name:'Spojená levice pro Prahu (KSČM - ČSSD)',short:'Spojená levice',color:'#c64049',seats2022:0},
+  {id:3,name:'PATRIOTI PRO PRAHU 8',short:'Patrioti',color:'#997126',seats2022:3},
+  {id:4,name:'ODS s podporou KDU-ČSL',short:'ODS + KDU-ČSL',color:'#2f6fba',seats2022:10},
+  {id:5,name:'Mourek s podporou SEN PRO PRAHU s Václavem Láskou',short:'Mourek + SEN 21',color:'#8b5d3b',seats2022:0},
+  {id:6,name:'Česká pirátská strana',short:'Piráti',color:'#161616',seats2022:6},
+  {id:7,name:'STAROSTOVÉ A NEZÁVISLÍ + TOP 09 – Společně pro Prahu 8',short:'STAN + TOP 09',color:'#7150aa',seats2022:5},
+  {id:8,name:'SPD pro Prahu 8 s podporou Česká párty, PRO a Svobodní',short:'SPD + partneři',color:'#275f9e',seats2022:3},
+  {id:9,name:'ANO 2011',short:'ANO',color:'#25a2c4',seats2022:9}
+];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const party=id=>parties.find(p=>p.id===Number(id));
+let selectedParty=6,mapMode='party',history=null,geo=null,candidates=[],live=new Map(),liveTotals=new Map(),liveSeats=new Map(),summary={total:106,done:0,turnout:null,complete:false},svgBounds=null,selectedPrecinct=null,councillorFilter='all';
+const coalition=new Set([3,4,7,9]);
 
-  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'"></script>
-  <script src="./app.js" type="module"></script>
+function pct(v){return v==null||Number.isNaN(+v)?'—':(+v).toLocaleString('cs-CZ',{minimumFractionDigits:1,maximumFractionDigits:1})}
+function int(v){return Number(v||0).toLocaleString('cs-CZ')}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function afterClose(){return new Date()>=CLOSE}
+function histParty(id){return history?.parties?.find(p=>Number(p.currentId)===Number(id))||null}
+function histPrec(n){return history?.precincts?.[String(n)]||null}
+function sourceFor(n){return live.get(String(n))?{source:'2026',data:live.get(String(n))}:histPrec(n)?{source:'2022',data:histPrec(n)}:{source:null,data:null}}
+function partyPct(item,id){if(!item?.data)return null;if(item.source==='2026'){const votes=item.data.partyVotes?.[id]||0;return item.data.totalVotes?votes/item.data.totalVotes*100:null}const votes=item.data.currentParties?.[id]||0;return item.data.validVotes?votes/item.data.validVotes*100:null}
+function turnout(item){if(!item?.data)return null;if(item.source==='2022')return item.data.turnout??null;return item.data.registered?item.data.envelopes/item.data.registered*100:null}
+function winner(item){if(!item?.data)return null;if(item.source==='2022')return Number(item.data.winnerId||0)||null;let win=null,max=-1;for(const [id,v] of Object.entries(item.data.partyVotes||{})){if(v>max){max=v;win=Number(id)}}return win}
+function currentResult(id){const lt=liveTotals.get(Number(id));if(summary.done>0&&lt?.pct!=null)return{pct:lt.pct,seats:liveSeats.get(Number(id))||0,source:'2026'};const h=histParty(id);return h?{pct:h.pct,seats:h.seats??party(id)?.seats2022??0,source:'2022'}:{pct:null,seats:0,source:'—'}}
+function colorParty(v){if(v==null)return'#ece9ee';return v>=35?'#2c1450':v>=30?'#3a1c65':v>=25?'#4e2b7d':v>=20?'#664493':v>=15?'#8267a6':v>=10?'#a293b7':v>=5?'#c8bfd1':'#ddd8e2'}
+function colorTurnout(v){if(v==null)return'#ece9ee';return v>=60?'#2c1450':v>=55?'#49306c':v>=50?'#675080':v>=45?'#88759a':v>=40?'#aa9db4':v>=35?'#c9c0cf':'#e1dce5'}
+
+async function json(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error(`${url}: ${r.status}`);return r.json()}
+async function text(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error(`${url}: ${r.status}`);return r.text()}
+
+function renderOverview(){const r=currentResult(selectedParty),p=party(selectedParty);$('#selected-name').textContent=p.name.toLocaleUpperCase('cs-CZ');$('#selected-pct').textContent=pct(r.pct);$('#selected-seats').textContent=r.seats;$('#selected-note').textContent=r.source==='2026'?`Průběžný výsledek · sečteno ${summary.done}/${summary.total}`:r.source==='2022'?'Výsledek komunálních voleb 2022':'Bez dat';$('#selected-seats-note').innerHTML=r.source==='2026'?'průběžně<br>2026':'mandátů<br>v 2022';$('#counted-stat').textContent=`${summary.done} / ${summary.total}`;$('#turnout-stat').textContent=summary.done&&summary.turnout!=null?`${pct(summary.turnout)} %`:'—';const seatSum=[...liveSeats.values()].reduce((a,b)=>a+b,0);$('#seats-stat').textContent=`${seatSum} / 45`;const vals=parties.map(p=>({p,r:currentResult(p.id)})),mx=Math.max(25,...vals.map(x=>x.r.pct||0));$('#party-list-note').textContent=summary.done?'průběžné výsledky 2026':'výsledky 2022';$('#party-list').innerHTML=vals.map(({p,r})=>`<div class="party-row ${p.id===selectedParty?'active':''}" data-party="${p.id}"><div class="party-label"><span class="party-dot" style="background:${p.color}"></span><span>${esc(p.short)}</span></div><div class="party-score">${r.pct==null?'—':pct(r.pct)+' %'}${r.source==='2022'?' · 2022':''}</div><div class="party-track"><span style="width:${Math.min(100,(r.pct||0)/mx*100)}%;background:${p.color}"></span></div></div>`).join('');$$('.party-row').forEach(el=>el.onclick=()=>{selectedParty=+el.dataset.party;mapMode='party';$$('.map-mode').forEach(b=>b.classList.toggle('active',b.dataset.mapMode==='party'));renderAll()})}
+
+function renderLegend(){let rows=[];if(mapMode==='party'){const p=party(selectedParty);$('#legend-title').textContent=`${p.short.toLocaleUpperCase('cs-CZ')} — PODÍL HLASŮ`;rows=[['35+ %','#2c1450'],['30–35 %','#3a1c65'],['25–30 %','#4e2b7d'],['20–25 %','#664493'],['15–20 %','#8267a6'],['10–15 %','#a293b7'],['5–10 %','#c8bfd1'],['< 5 %','#ddd8e2']]}else if(mapMode==='winner'){$('#legend-title').textContent='VÍTĚZ V OKRSKU';rows=parties.map(p=>[p.short,p.color])}else{$('#legend-title').textContent='VOLEBNÍ ÚČAST';rows=[['60+ %','#2c1450'],['55–60 %','#49306c'],['50–55 %','#675080'],['45–50 %','#88759a'],['40–45 %','#aa9db4'],['35–40 %','#c9c0cf'],['< 35 %','#e1dce5']]}$('#legend-grid').innerHTML=rows.map(([l,c])=>`<div class="legend-item"><span class="legend-swatch" style="background:${c}"></span>${esc(l)}</div>`).join('')}
+
+function pathForCoords(coords,b){const [minX,minY,maxX,maxY]=b,w=940,h=660,pad=30,s=Math.min(w/(maxX-minX),h/(maxY-minY));const x=v=>pad+(v-minX)*s,y=v=>pad+(maxY-v)*s;const ring=r=>r.map((pt,i)=>`${i?'L':'M'}${x(pt[0]).toFixed(2)},${y(pt[1]).toFixed(2)}`).join(' ')+' Z';return coords.map(poly=>poly.map(ring).join(' ')).join(' ')}
+function normalizeGeom(g){if(g.type==='Polygon')return[g.coordinates];if(g.type==='MultiPolygon')return g.coordinates;return[]}
+function computeBounds(features){let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;const walk=a=>{if(typeof a?.[0]==='number'){minX=Math.min(minX,a[0]);maxX=Math.max(maxX,a[0]);minY=Math.min(minY,a[1]);maxY=Math.max(maxY,a[1]);return}for(const x of a||[])walk(x)};features.forEach(f=>walk(f.geometry?.coordinates));return[minX,minY,maxX,maxY]}
+function fillFor(n){const item=sourceFor(n);if(mapMode==='party')return colorParty(partyPct(item,selectedParty));if(mapMode==='winner')return party(winner(item))?.color||'#ded9e1';return colorTurnout(turnout(item))}
+function renderMap(){if(!geo)return;const svg=$('#map-svg');if(!svgBounds)svgBounds=computeBounds(geo.features);svg.innerHTML=geo.features.map(f=>{const n=String(f.properties?.cislo||'');return`<path class="precinct-shape ${selectedPrecinct===n?'selected':''}" data-precinct="${n}" d="${pathForCoords(normalizeGeom(f.geometry),svgBounds)}" fill="${fillFor(n)}" opacity="${sourceFor(n).source==='2026'?'.92':'.78'}"></path>`}).join('');$$('.precinct-shape').forEach(el=>{el.addEventListener('mousemove',showTip);el.addEventListener('mouseenter',showTip);el.addEventListener('mouseleave',()=>{$('#map-tooltip').hidden=true});el.addEventListener('click',()=>selectPrecinct(el.dataset.precinct))});$('#map-loading')?.remove();updateMapStatus()}
+function showTip(e){const n=e.currentTarget.dataset.precinct,item=sourceFor(n),p=party(selectedParty),t=$('#map-tooltip');const win=party(winner(item));let val=mapMode==='party'?`${pct(partyPct(item,selectedParty))} %`:mapMode==='winner'?(win?.short||'—'):`${pct(turnout(item))} %`;t.innerHTML=`<strong>Okrsek ${n}</strong><div>${mapMode==='party'?esc(p.short):mapMode==='winner'?'Vítěz':'Účast'}</div><div class="tooltip-value">${esc(val)}</div><div class="tooltip-sub">data ${item.source||'—'}</div>`;const r=$('#map').getBoundingClientRect();t.style.left=Math.min(r.width-260,Math.max(8,e.clientX-r.left+14))+'px';t.style.top=Math.min(r.height-120,Math.max(8,e.clientY-r.top+14))+'px';t.hidden=false}
+function selectPrecinct(n){selectedPrecinct=String(n);renderMap();renderPrecincts();$('#map-reset').hidden=false;const shape=$(`.precinct-shape[data-precinct="${n}"]`);if(shape){const box=shape.getBBox(),svg=$('#map-svg'),pad=18;svg.setAttribute('viewBox',`${box.x-pad} ${box.y-pad} ${box.width+pad*2} ${box.height+pad*2}`)}}
+function resetMap(){selectedPrecinct=null;$('#map-svg').setAttribute('viewBox','0 0 1000 720');$('#map-reset').hidden=true;renderMap()}
+function updateMapStatus(){const liveCount=live.size;if(!history){$('#year-ribbon').textContent='MAPA: NAČÍTÁM DATA';$('#map-status').innerHTML='<strong>Hranice okrsků jsou načtené.</strong> Čekám na výsledková data.'}else if(!liveCount){$('#year-ribbon').textContent='MAPA: VOLBY 2022';$('#map-status').innerHTML='<strong>Mapa funguje.</strong> Do začátku sčítání ukazuje výsledky komunálních voleb 2022.'}else if(liveCount<summary.total){$('#year-ribbon').textContent=`2026: ${liveCount}/${summary.total} OKRSKŮ`;$('#map-status').innerHTML=`<strong>${liveCount}</strong> okrsků už zobrazuje 2026, ostatní zatím 2022.`}else{$('#year-ribbon').textContent='MAPA: VOLBY 2026';$('#map-status').innerHTML='<strong>Praha 8 je sečtená.</strong> Mapa zobrazuje volby 2026.'}}
+
+function renderPrecincts(){const q=($('#precinct-search').value||'').trim();const rows=[];for(let n=MIN;n<=MAX;n++){const s=String(n);if(q&&!s.includes(q))continue;const item=sourceFor(s),w=party(winner(item));rows.push(`<div class="precinct-row ${selectedPrecinct===s?'active':''}" data-n="${s}"><div class="precinct-no">${s}</div><div class="precinct-main"><strong>${w?'Vítěz: '+esc(w.short):'Bez výsledku'} · ${esc(party(selectedParty).short)} ${pct(partyPct(item,selectedParty))} %</strong><span>Účast ${pct(turnout(item))} %</span></div><span class="precinct-source ${item.source==='2026'?'live':''}">${item.source||'—'}</span></div>`)}$('#precinct-list').innerHTML=rows.join('')||'<div class="empty-state">Žádný okrsek.</div>';$$('.precinct-row').forEach(el=>el.onclick=()=>selectPrecinct(el.dataset.n))}
+
+function electedList(){const e26=candidates.filter(c=>c.elected);return e26.length?{year:2026,list:e26}:{year:2022,list:history?.councillors||[]}}
+function candidateParty(c,year){return year===2026?Number(c.ballot):Number(c.currentId||0)}
+function displayName(c){return `${c.titleBefore?c.titleBefore+' ':''}${c.firstName||''} ${c.lastName||''}${c.titleAfter?', '+c.titleAfter:''}`.replace(/\s+/g,' ').trim()}
+function renderCouncillors(){const {year,list}=electedList(),ids=[...new Set(list.map(c=>candidateParty(c,year)).filter(Boolean))];if(councillorFilter!=='all'&&!ids.includes(+councillorFilter))councillorFilter='all';$('#councillors-title').textContent=`Zastupitelstvo ${year}`;$('#councillors-count').textContent=list.length||'—';$('#councillors-help').textContent=year===2026?'Zvolení zastupitelé podle výsledků komunálních voleb 2026.':'Do přidělení mandátů 2026 zobrazujeme zastupitele zvolené v roce 2022.';$('#councillor-filters').innerHTML=`<button class="filter-chip ${councillorFilter==='all'?'active':''}" data-p="all">Všichni</button>`+ids.map(id=>`<button class="filter-chip ${+councillorFilter===id?'active':''}" data-p="${id}">${esc(party(id)?.short||id)}</button>`).join('');$$('.filter-chip').forEach(b=>b.onclick=()=>{councillorFilter=b.dataset.p==='all'?'all':+b.dataset.p;renderCouncillors()});const filtered=councillorFilter==='all'?list:list.filter(c=>candidateParty(c,year)===+councillorFilter);$('#councillors-list').innerHTML=filtered.map(c=>{const p=party(candidateParty(c,year));return`<div class="councillor-row"><div class="councillor-color" style="background:${p?.color||'#aaa'}"></div><div><div class="councillor-name">${esc(displayName(c))}</div><div class="councillor-meta">${esc([p?.short,c.occupation,c.age?c.age+' let':null].filter(Boolean).join(' · '))}</div></div><div class="councillor-votes">${c.votes?int(c.votes)+' hl.':''}</div></div>`}).join('')||'<div class="empty-state">Zvolení zatím nejsou k dispozici.</div>'}
+
+function seats(id){const sum=[...liveSeats.values()].reduce((a,b)=>a+b,0);return sum?liveSeats.get(Number(id))||0:histParty(id)?.seats??party(id)?.seats2022??0}
+function renderCoalition(){const sumLive=[...liveSeats.values()].reduce((a,b)=>a+b,0);$('#coalition-help').textContent=sumLive?'Kalkulačka používá aktuálně přidělené mandáty 2026.':'Před přidělením mandátů 2026 používá kalkulačka mandáty 2022.';$('#coalition-list').innerHTML=parties.map(p=>`<label class="coalition-option"><input type="checkbox" data-p="${p.id}" ${coalition.has(p.id)?'checked':''}><span class="party-dot" style="background:${p.color}"></span><strong>${esc(p.short)}</strong><span>${seats(p.id)} mand.</span></label>`).join('');$$('.coalition-option input').forEach(i=>i.onchange=()=>{i.checked?coalition.add(+i.dataset.p):coalition.delete(+i.dataset.p);renderCoalitionMeter()});renderCoalitionMeter()}
+function renderCoalitionMeter(){const total=[...coalition].reduce((a,id)=>a+seats(id),0);$('#coalition-total').textContent=total;const m=$('#coalition-majority');m.textContent=total>=23?`Většina +${total-22}`:`Chybí ${23-total}`;m.classList.toggle('ok',total>=23);$('#coalition-strip').innerHTML=Array.from({length:45},(_,i)=>`<span class="seat ${i<total?'filled':''}"></span>`).join('')}
+
+function renderAll(){renderOverview();renderLegend();renderMap();renderPrecincts();renderCouncillors();renderCoalition();updateCountdown()}
+function parseSummary(xml){const d=new DOMParser().parseFromString(xml,'application/xml'),u=d.querySelector('UCAST'),o=d.querySelector('OBEC');summary.total=+(u?.getAttribute('OKRSKY_CELKEM')||106);summary.done=+(u?.getAttribute('OKRSKY_ZPRAC')||0);summary.turnout=+(u?.getAttribute('UCAST_PROC')||0)||null;summary.complete=o?.getAttribute('JE_SPOCTENO')==='1'||summary.done>=summary.total;liveTotals=new Map();liveSeats=new Map();d.querySelectorAll('VOLEBNI_STRANA').forEach(n=>{const id=+(n.getAttribute('POR_STR_HLAS_LIST')||n.getAttribute('POR_STR_HL')||0);if(!id)return;liveTotals.set(id,{pct:+(n.getAttribute('HLASY_PROC')||0),votes:+(n.getAttribute('HLASY')||0)});liveSeats.set(id,+(n.getAttribute('ZASTUPITELE_POCET')||0))})}
+function parseBatch(xml){const d=new DOMParser().parseFromString(xml,'application/xml');d.querySelectorAll('OKRSEK').forEach(n=>{const no=String(n.getAttribute('CIS_OKRSEK')||n.getAttribute('OKRSEK')||'').replace(/^0+/,'');const num=+no;if(num<MIN||num>MAX)return;const votes={};n.querySelectorAll('HLASY_OKRSEK,VOLEBNI_STRANA,STRANA,HLAS_STRANA').forEach(x=>{const id=+(x.getAttribute('POR_STR_HL')||x.getAttribute('POR_STR_HLAS_LIST')||0),v=+(x.getAttribute('POC_HLASU')||x.getAttribute('HLASY')||0);if(id)votes[id]=v});const total=+(n.getAttribute('PL_HL_CELK')||0)||Object.values(votes).reduce((a,b)=>a+b,0);if(!total||!Object.keys(votes).length)return;const u=n.querySelector('UCAST');live.set(no,{partyVotes:votes,totalVotes:total,registered:+(n.getAttribute('VOL_SEZNAM')||u?.getAttribute('ZAPSANI_VOLICI')||0),envelopes:+(n.getAttribute('VYD_OBALKY')||u?.getAttribute('VYD_OBALKY')||0)})})}
+async function sync(){try{parseSummary(await text('/api/summary'));if(afterClose()){try{parseBatch(await text('/api/batch?n=latest'))}catch(e){console.warn('Batch:',e)}}renderAll()}catch(e){console.warn('Summary:',e)}finally{$('#checked-at').textContent='kontrola '+new Date().toLocaleTimeString('cs-CZ')}}
+function updateCountdown(){const diff=CLOSE-new Date();if(diff>0){const d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000);$('#countdown').textContent=`${d} d ${h} h ${m} min`;$('#phase-pill').textContent='PŘED VOLBAMI'}else{$('#phase-pill').textContent=summary.complete?'SEČTENO':'SČÍTÁNÍ';$('#countdown').textContent=`${summary.done} / ${summary.total} okrsků`;$('#countdown-note').textContent='Data ČSÚ se automaticky obnovují. Nesečtené okrsky zůstávají dočasně na výsledcích 2022.'}}
+
+function setup(){$$('.tab').forEach(b=>b.onclick=()=>{$$('.tab').forEach(x=>x.classList.toggle('active',x===b));$$('.tab-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===b.dataset.tab))});$$('.map-mode').forEach(b=>b.onclick=()=>{mapMode=b.dataset.mapMode;$$('.map-mode').forEach(x=>x.classList.toggle('active',x===b));renderLegend();renderMap()});$('#precinct-search').oninput=renderPrecincts;$('#map-reset').onclick=resetMap;$('#refresh-btn').onclick=async()=>{await sync();toast('Data obnovena.')}}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,2200)}
+
+async function main(){setup();updateCountdown();setInterval(updateCountdown,30000);const results=await Promise.allSettled([json('/api/geo'),json('/api/history'),json('/api/candidates'),text('/api/summary')]);if(results[0].status==='fulfilled'){geo=results[0].value}else{$('#map-loading').textContent='Hranice okrsků se nepodařilo načíst.'}if(results[1].status==='fulfilled')history=results[1].value;if(results[2].status==='fulfilled')candidates=results[2].value.candidates||[];if(results[3].status==='fulfilled')parseSummary(results[3].value);renderAll();let c=REFRESH;$('#refresh-label').textContent=c+' s';setInterval(async()=>{if(--c<=0){c=REFRESH;await sync()}$('#refresh-label').textContent=c+' s'},1000);$('#checked-at').textContent='kontrola '+new Date().toLocaleTimeString('cs-CZ')}
+main();
+
+</script>
 </body>
 </html>
