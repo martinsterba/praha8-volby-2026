@@ -1,7 +1,6 @@
 const URL = 'https://volby.gov.cz/opendata/kv2026/csv_od/kvrk.csv';
-const CODE = '500208';
-
-let cache = null;
+const CODES = { p8: '500208', hmp: '554782' };
+const caches = new Map();
 
 function parseDelimited(text) {
   const clean = text.replace(/^\uFEFF/, '');
@@ -25,12 +24,13 @@ function parseDelimited(text) {
   return rows.filter(r => r.some(v => v !== '')).map(r => Object.fromEntries(headers.map((h, i) => [h, (r[i] ?? '').trim()])));
 }
 
-async function loadCandidates() {
+async function loadCandidates(scope) {
+  const code = CODES[scope];
   const resp = await fetch(URL, { headers: { 'User-Agent': 'Praha8-volby-2026/1.0' } });
   if (!resp.ok) throw new Error(`ČSÚ kandidáti HTTP ${resp.status}`);
   const rows = parseDelimited(await resp.text());
   return rows
-    .filter(r => String(r.KODZASTUP) === CODE)
+    .filter(r => String(r.KODZASTUP) === code)
     .map(r => ({
       ballot: Number(r.POR_STR_HL || 0),
       candidateNo: Number(r.PORCISLO || 0),
@@ -49,15 +49,17 @@ async function loadCandidates() {
       substituteOrder: Number(r.PORADINAHR || 0)
     }))
     .filter(c => c.valid)
-    .sort((a,b) => a.ballot - b.ballot || a.candidateNo - b.candidateNo);
+    .sort((a, b) => a.ballot - b.ballot || a.candidateNo - b.candidateNo);
 }
 
 export default async function handler(req, res) {
+  const scope = String(req.query?.scope || 'p8').toLowerCase() === 'hmp' ? 'hmp' : 'p8';
   try {
-    if (!cache) cache = await loadCandidates();
+    if (!caches.has(scope)) caches.set(scope, await loadCandidates(scope));
+    const candidates = caches.get(scope);
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=3600');
-    res.status(200).json({ candidates: cache, elected: cache.filter(c => c.elected).sort((a,b) => a.mandateOrder - b.mandateOrder) });
+    res.status(200).json({ scope, candidates, elected: candidates.filter(c => c.elected).sort((a, b) => a.mandateOrder - b.mandateOrder) });
   } catch (error) {
-    res.status(502).json({ error: 'Nepodařilo se načíst kandidáty ČSÚ.', detail: String(error.message || error) });
+    res.status(502).json({ error: 'Nepodařilo se načíst kandidáty ČSÚ.', detail: String(error.message || error), scope });
   }
 }

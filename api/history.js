@@ -3,21 +3,16 @@ import AdmZip from 'adm-zip';
 const T3_URL = 'https://volby.gov.cz/opendata/kv2022/csv_od/kvt3_csvod.zip';
 const HL_URL = 'https://volby.gov.cz/opendata/kv2022/csv_od/kvhl_csvod.zip';
 const KAND_URL = 'https://volby.gov.cz/opendata/kv2022/csv_od/kvrk.csv';
+const ROS_URL = 'https://volby.gov.cz/opendata/kv2022/csv_od/kvros.csv';
 const DATE = '20220923';
-const CODE = '500208';
+const CODES = { p8: '500208', hmp: '554782' };
+const P8_BALLOT_TO_2026 = { 1: 4, 2: 8, 4: 9, 5: 6, 6: 7, 8: 5, 11: 1, 12: 3 };
+const caches = new Map();
 
-const PARTY_2022 = [
-  { ballot: 1, currentId: 4, name: 'Občanská demokratická strana', short: 'ODS', seats: 10 },
-  { ballot: 2, currentId: 8, name: 'SPD a Trikolora pro Osmičku', short: 'SPD + Trikolora', seats: 3 },
-  { ballot: 4, currentId: 9, name: 'ANO 2011', short: 'ANO', seats: 9 },
-  { ballot: 5, currentId: 6, name: 'Česká pirátská strana', short: 'Piráti', seats: 6 },
-  { ballot: 6, currentId: 7, name: 'Společně pro Prahu 8 - TOP 09 a Starostové a nezávislí', short: 'TOP 09 + STAN', seats: 5 },
-  { ballot: 8, currentId: 5, name: 'Libeňský mourek', short: 'Libeňský mourek', seats: 0 },
-  { ballot: 11, currentId: 1, name: '8ŽIJE a PRAHA SOBĚ, kandidáti podpoření podpisy občanů', short: '8ŽIJE + Praha sobě', seats: 9 },
-  { ballot: 12, currentId: 3, name: 'PATRIOTI PRO PRAHU 8', short: 'Patrioti', seats: 3 }
-];
-
-let cache = null;
+function number(value) {
+  const n = Number(String(value ?? '').replace(',', '.').replace(/\s/g, ''));
+  return Number.isFinite(n) ? n : 0;
+}
 
 function parseDelimited(text) {
   const clean = text.replace(/^\uFEFF/, '');
@@ -48,33 +43,75 @@ function unzipCsv(buf) {
   return entry.getData().toString('utf8');
 }
 
-async function buildHistory() {
-  const [t3Resp, hlResp, kandResp] = await Promise.all([
-    fetch(T3_URL), fetch(HL_URL), fetch(KAND_URL)
+function compactName(name) {
+  const n = String(name || '');
+  const low = n.toLocaleLowerCase('cs-CZ');
+  if (low.includes('piráts')) return 'Piráti';
+  if (low.includes('praha sobě')) return 'PRAHA SOBĚ';
+  if (low.includes('starostové') || /\bstan\b/i.test(n)) return 'STAN';
+  if (low.includes('spolu')) return 'SPOLU';
+  if (low.includes('ano 2011')) return 'ANO';
+  if (low.includes('spd')) return 'SPD';
+  if (low.includes('motorist')) return 'Motoristé';
+  if (low.includes('patrioti')) return 'Patrioti';
+  if (low.includes('sen pro prahu')) return 'SEN 21';
+  if (low.includes('spojená levice')) return 'Spojená levice';
+  if (low.includes('svobodní')) return 'Svobodní';
+  return n.length > 30 ? `${n.slice(0, 28)}…` : n;
+}
+
+async function buildHistory(scope) {
+  const code = CODES[scope];
+  const [t3Resp, hlResp, kandResp, rosResp] = await Promise.all([
+    fetch(T3_URL), fetch(HL_URL), fetch(KAND_URL), fetch(ROS_URL)
   ]);
-  for (const [label, resp] of [['T3', t3Resp], ['HL', hlResp], ['KAND', kandResp]]) {
+  for (const [label, resp] of [['T3', t3Resp], ['HL', hlResp], ['KAND', kandResp], ['ROS', rosResp]]) {
     if (!resp.ok) throw new Error(`${label} HTTP ${resp.status}`);
   }
 
-  const [t3Buf, hlBuf, kandText] = await Promise.all([
-    t3Resp.arrayBuffer(), hlResp.arrayBuffer(), kandResp.text()
+  const [t3Buf, hlBuf, kandText, rosText] = await Promise.all([
+    t3Resp.arrayBuffer(), hlResp.arrayBuffer(), kandResp.text(), rosResp.text()
   ]);
 
+  const rosRows = parseDelimited(rosText).filter(r => String(r.DATUMVOLEB) === DATE && String(r.KODZASTUP) === code);
+  const partyByBallot = new Map();
+  const parties = rosRows.map(r => {
+    const ballot = number(r.POR_STR_HL);
+    const name = r.NAZEVCELK || r.NAZEV_STRANY || r.ZKRATKAO30 || `Strana ${ballot}`;
+    const currentId = scope === 'p8' ? (P8_BALLOT_TO_2026[ballot] || null) : ballot;
+    const item = {
+      ballot,
+      currentId,
+      name,
+      short: r.ZKRATKAO30 || r.ZKRATKAO8 || compactName(name),
+      votes: number(r.HLASY_STR),
+      pct: number(r.PROCHLSTR),
+      seats: number(r.MAND_STR),
+      localVotes: 0,
+      localPct: null
+    };
+    partyByBallot.set(String(ballot), item);
+    return item;
+  }).filter(p => p.ballot > 0);
+
   const t3Rows = parseDelimited(unzipCsv(t3Buf));
-  const t3 = t3Rows.filter(r => String(r.DATUMVOLEB) === DATE && String(r.KODZASTUP) === CODE);
-  const ids = new Set(t3.map(r => String(r.ID_OKRSKY)));
+  const allT3 = t3Rows.filter(r => String(r.DATUMVOLEB) === DATE && String(r.KODZASTUP) === code);
+  const localT3 = scope === 'hmp'
+    ? allT3.filter(r => number(r.OKRSEK) >= 8001 && number(r.OKRSEK) <= 8108)
+    : allT3;
+  const ids = new Set(localT3.map(r => String(r.ID_OKRSKY)));
   const precincts = {};
 
-  for (const r of t3) {
-    const p = String(r.OKRSEK);
-    const registered = Number(r.VOL_SEZNAM || 0);
-    const envelopes = Number(r.VYD_OBALKY || 0);
+  for (const r of localT3) {
+    const p = String(number(r.OKRSEK));
+    const registered = number(r.VOL_SEZNAM);
+    const envelopes = number(r.VYD_OBALKY);
     precincts[p] = {
-      precinct: Number(p),
+      precinct: number(p),
       registered,
       envelopes,
-      submitted: Number(r.ODEVZ_OBAL || 0),
-      validVotes: Number(r.PL_HL_CELK || 0),
+      submitted: number(r.ODEVZ_OBAL),
+      validVotes: number(r.PL_HL_CELK),
       turnout: registered ? envelopes / registered * 100 : null,
       parties: {},
       currentParties: {},
@@ -82,78 +119,78 @@ async function buildHistory() {
     };
   }
 
-  const ballotMap = Object.fromEntries(PARTY_2022.map(p => [String(p.ballot), p.currentId]));
   const hlRows = parseDelimited(unzipCsv(hlBuf));
   for (const r of hlRows) {
     if (String(r.DATUMVOLEB) !== DATE || !ids.has(String(r.ID_OKRSKY))) continue;
-    const p = String(r.OKRSEK);
+    const p = String(number(r.OKRSEK));
     if (!precincts[p]) continue;
-    const ballot = String(r.POR_STR_HL);
-    const votes = Number(r.POC_HLASU || 0);
+    const ballot = String(number(r.POR_STR_HL));
+    const votes = number(r.POC_HLASU);
     precincts[p].parties[ballot] = votes;
-    const cid = ballotMap[ballot];
-    if (cid) precincts[p].currentParties[String(cid)] = (precincts[p].currentParties[String(cid)] || 0) + votes;
+    const currentId = scope === 'p8' ? P8_BALLOT_TO_2026[ballot] : number(ballot);
+    if (currentId) precincts[p].currentParties[String(currentId)] = (precincts[p].currentParties[String(currentId)] || 0) + votes;
   }
 
+  let localTotal = 0;
+  const localByBallot = {};
   for (const pdata of Object.values(precincts)) {
-    const ranked = Object.entries(pdata.currentParties).sort((a,b) => b[1]-a[1]);
-    pdata.winnerId = ranked.length ? Number(ranked[0][0]) : null;
-  }
-
-  const totals = {};
-  let allVotes = 0;
-  for (const pdata of Object.values(precincts)) {
-    allVotes += pdata.validVotes || 0;
-    for (const [id, votes] of Object.entries(pdata.currentParties)) {
-      totals[id] = (totals[id] || 0) + votes;
+    localTotal += pdata.validVotes || 0;
+    for (const [ballot, votes] of Object.entries(pdata.parties)) {
+      localByBallot[ballot] = (localByBallot[ballot] || 0) + votes;
     }
+    const ranked = Object.entries(pdata.currentParties).sort((a, b) => b[1] - a[1]);
+    pdata.winnerId = ranked.length ? number(ranked[0][0]) : null;
   }
-  const parties = PARTY_2022.map(p => ({
-    ...p,
-    votes: totals[p.currentId] || 0,
-    pct: allVotes ? (totals[p.currentId] || 0) / allVotes * 100 : null
-  }));
+  for (const p of parties) {
+    p.localVotes = localByBallot[String(p.ballot)] || 0;
+    p.localPct = localTotal ? p.localVotes / localTotal * 100 : null;
+  }
 
-  const partyByBallot = Object.fromEntries(PARTY_2022.map(p => [String(p.ballot), p]));
   const kandRows = parseDelimited(kandText);
   const councillors = kandRows
-    .filter(r => String(r.DATUMVOLEB) === DATE && String(r.KODZASTUP) === CODE && String(r.MANDAT).toUpperCase() === 'A')
+    .filter(r => String(r.DATUMVOLEB) === DATE && String(r.KODZASTUP) === code && String(r.MANDAT).toUpperCase() === 'A')
     .map(r => {
-      const party = partyByBallot[String(r.POR_STR_HL)];
+      const ballot = number(r.POR_STR_HL);
+      const party = partyByBallot.get(String(ballot));
       return {
-        ballot: Number(r.POR_STR_HL || 0),
-        candidateNo: Number(r.PORCISLO || 0),
+        ballot,
+        candidateNo: number(r.PORCISLO),
         firstName: r.JMENO || '',
         lastName: r.PRIJMENI || '',
         titleBefore: r.TITULPRED || '',
         titleAfter: r.TITULZA || '',
-        age: Number(r.VEK || 0) || null,
+        age: number(r.VEK) || null,
         occupation: r.POVOLANI || '',
         residence: r.BYDLISTEN || '',
-        votes: Number(r.POCHLASU || 0),
-        mandateOrder: Number(r.PORADIMAND || 0),
-        currentId: party?.currentId || null,
+        votes: number(r.POCHLASU),
+        mandateOrder: number(r.PORADIMAND),
+        currentId: scope === 'p8' ? (P8_BALLOT_TO_2026[ballot] || null) : ballot,
         partyName: party?.name || ''
       };
     })
-    .sort((a,b) => (a.currentId || 99) - (b.currentId || 99) || a.mandateOrder - b.mandateOrder);
+    .sort((a, b) => a.ballot - b.ballot || a.mandateOrder - b.mandateOrder);
 
   return {
+    scope,
     year: 2022,
+    code,
+    seatCount: scope === 'hmp' ? 65 : 45,
     generatedAt: new Date().toISOString(),
     parties,
     councillors,
     precincts,
-    precinctCount: Object.keys(precincts).length
+    precinctCount: Object.keys(precincts).length,
+    localTotalVotes: localTotal
   };
 }
 
 export default async function handler(req, res) {
+  const scope = String(req.query?.scope || 'p8').toLowerCase() === 'hmp' ? 'hmp' : 'p8';
   try {
-    if (!cache) cache = await buildHistory();
+    if (!caches.has(scope)) caches.set(scope, await buildHistory(scope));
     res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=604800');
-    res.status(200).json(cache);
+    res.status(200).json(caches.get(scope));
   } catch (error) {
-    res.status(502).json({ error: 'Nepodařilo se připravit historická data 2022.', detail: String(error.message || error) });
+    res.status(502).json({ error: 'Nepodařilo se připravit historická data 2022.', detail: String(error.message || error), scope });
   }
 }
